@@ -138,77 +138,59 @@ window.addEventListener("DOMContentLoaded", function () {
     let form = document.querySelector(".main-form"),
         input = form.getElementsByTagName("input"),
         statusMassage = document.createElement("div"), //Создаем новый элемент div, где будем размещать статус отправки формы
-        contactForm = document.querySelector("#form"),
-        contactInput = contactForm.getElementsByTagName("input");
-
+        contactForm = document.querySelector("#form");
 
     statusMassage.classList.add("status");
 
-    //ВАЖНО! Отслеживаем, когда форма отправляет на сервер, а не кнопка. (Модальная форма)
-    form.addEventListener("submit", function (event) {
-        event.preventDefault(); //Отменяем стандартное поведение браузера
-        form.appendChild(statusMassage); //Вставляем в конец формы наш элемент div
+    //----------------------------------------------------
+    //ВАЖНО! Отслеживаем, когда форма отправляет на сервер, а не кнопка. (Форма контактов и модального окна)
+    function sendForm(elem) {
+        elem.addEventListener("submit", function (event) {
+            event.preventDefault(); //Отменяем стандартное поведение браузера
+            elem.appendChild(statusMassage); //Вставляем в конец формы наш элемент div
 
-        let request = new XMLHttpRequest(); //Создаем объект через который будем выполнять HTTP-запросы
-        request.open("POST", "server.php"); //Инициализируем запрос на сервер
-        //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Указываем заголовок HTTP-запроса. Наш контент будет получен из формы.
-        request.setRequestHeader('Content-type', 'application/json; charset=utf-8'); //Указываем заголовок HTTP-запроса. Указываем на JSON
+            let request = new XMLHttpRequest(); //Создаем объект через который будем выполнять HTTP-запросы
+            request.open("POST", "server.php"); //Инициализируем запрос на сервер
+            //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Указываем заголовок HTTP-запроса. Наш контент будет получен из формы.
+            request.setRequestHeader('Content-type', 'application/json; charset=utf-8'); //Указываем заголовок HTTP-запроса. Указываем на JSON
 
-        let formData = new FormData(form); //Получаем данные из формы
+            let formData = new FormData(elem); //Получаем данные из формы
 
-        //Перебираем массив через forEach и заполняем список для дальнейшего формирования JSON
-        let obj = {};
-        formData.forEach( function (value, key) {
-            obj[key] = value;
-        })
-        //Преобразуем в JSON формат
-        let json = JSON.stringify(obj);
-    });
-
-    //ВАЖНО! Отслеживаем, когда форма отправляет на сервер, а не кнопка. (Форма контактов)
-    contactForm.addEventListener("submit", function (event) {
-        event.preventDefault(); //Отменяем стандартное поведение браузера
-        contactForm.appendChild(statusMassage); //Вставляем в конец формы наш элемент div
-
-        let request = new XMLHttpRequest(); //Создаем объект через который будем выполнять HTTP-запросы
-        request.open("POST", "server.php"); //Инициализируем запрос на сервер
-        //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Указываем заголовок HTTP-запроса. Наш контент будет получен из формы.
-        request.setRequestHeader('Content-type', 'application/json; charset=utf-8'); //Указываем заголовок HTTP-запроса. Указываем на JSON
-
-        let formData = new FormData(contactForm); //Получаем данные из формы
-
-        //Перебираем массив через forEach и заполняем список для дальнейшего формирования JSON
-        let obj = {};
-        formData.forEach( function (value, key) {
-            obj[key] = value;
-        })
-        //Преобразуем в JSON формат
-        let json = JSON.stringify(obj);
+            //Перебираем массив через forEach и заполняем список для дальнейшего формирования JSON
+            let obj = {};
+            formData.forEach( function (value, key) {
+                obj[key] = value;
+            })
+            //Преобразуем в JSON формат
+            let json = JSON.stringify(obj);
 
 
-        // request.send(formData); // Отправляем данные из формы на сервер
-        request.send(json) // Отправляем данные в формате JSON
+            // request.send(formData); // Отправляем данные из формы на сервер
+            request.send(json) // Отправляем данные в формате JSON
 
-            //Наблюдаем за состоянием нашего запроса
-        request.addEventListener("readystatechange", function () {
-            //Отслеживаем загрузку, т.к. 4 статус DONE
-            if(request.readyState < 4) {
-                statusMassage.innerHTML = message.loading;  // Вставляем в наш div слово "Загрузка..."
-            }
-            //Отслеживаем завершение загрузки и положительного ответа
-            else if (request.readyState === 4 && request.status === 200) {
-                statusMassage.innerHTML = message.success; // Вставляем в наш div слово "Спасибо! Скоро мы с вами свяжемся!"
-            }
-            //В остальных случаях уведомляем пользователя об ошибке
-            else {
-                statusMassage.innerHTML = message.success; // Вставляем в наш div слово "Что-то пошло не так..."
-            }
+                //Наблюдаем за состоянием нашего запроса
+            request.addEventListener("readystatechange", function () {
+                //Отслеживаем загрузку, т.к. 4 статус DONE
+                if(request.readyState < 4) {
+                    statusMassage.innerHTML = message.loading;  // Вставляем в наш div слово "Загрузка..."
+                }
+                //Отслеживаем завершение загрузки и положительного ответа
+                else if (request.readyState === 4 && request.status === 200) {
+                    statusMassage.innerHTML = message.success; // Вставляем в наш div слово "Спасибо! Скоро мы с вами свяжемся!"
+                }
+                //В остальных случаях уведомляем пользователя об ошибке
+                else {
+                    statusMassage.innerHTML = message.success; // Вставляем в наш div слово "Что-то пошло не так..."
+                }
+            });
+                // Очищаем форму (все input) от введенных значений
+                for (let i = 0; i < input.length; i++) {
+                    input[i].value = '';
+                }
         });
-            // Очищаем форму (все imput) от введенных значений
-            for (let i = 0; i < contactInput.length; i++) {
-                contactInput[i].value = '';
             }
-    });
+        sendForm(form);
+        sendForm(contactForm);
 
 });
 
