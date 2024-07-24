@@ -137,11 +137,14 @@ window.addEventListener("DOMContentLoaded", function () {
     };
     let form = document.querySelector(".main-form"),
         input = form.getElementsByTagName("input"),
-        statusMassage = document.createElement("div"); //Создаем новый элемент div, где будем размещать статус отправки формы
+        statusMassage = document.createElement("div"), //Создаем новый элемент div, где будем размещать статус отправки формы
+        contactForm = document.querySelector("#form"),
+        contactInput = contactForm.getElementsByTagName("input");
+
 
     statusMassage.classList.add("status");
 
-    //ВАЖНО! Отслеживаем, когда форма отправляет на сервер, а не кнопка.
+    //ВАЖНО! Отслеживаем, когда форма отправляет на сервер, а не кнопка. (Модальная форма)
     form.addEventListener("submit", function (event) {
         event.preventDefault(); //Отменяем стандартное поведение браузера
         form.appendChild(statusMassage); //Вставляем в конец формы наш элемент div
@@ -152,6 +155,27 @@ window.addEventListener("DOMContentLoaded", function () {
         request.setRequestHeader('Content-type', 'application/json; charset=utf-8'); //Указываем заголовок HTTP-запроса. Указываем на JSON
 
         let formData = new FormData(form); //Получаем данные из формы
+
+        //Перебираем массив через forEach и заполняем список для дальнейшего формирования JSON
+        let obj = {};
+        formData.forEach( function (value, key) {
+            obj[key] = value;
+        })
+        //Преобразуем в JSON формат
+        let json = JSON.stringify(obj);
+    });
+
+    //ВАЖНО! Отслеживаем, когда форма отправляет на сервер, а не кнопка. (Форма контактов)
+    contactForm.addEventListener("submit", function (event) {
+        event.preventDefault(); //Отменяем стандартное поведение браузера
+        contactForm.appendChild(statusMassage); //Вставляем в конец формы наш элемент div
+
+        let request = new XMLHttpRequest(); //Создаем объект через который будем выполнять HTTP-запросы
+        request.open("POST", "server.php"); //Инициализируем запрос на сервер
+        //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Указываем заголовок HTTP-запроса. Наш контент будет получен из формы.
+        request.setRequestHeader('Content-type', 'application/json; charset=utf-8'); //Указываем заголовок HTTP-запроса. Указываем на JSON
+
+        let formData = new FormData(contactForm); //Получаем данные из формы
 
         //Перебираем массив через forEach и заполняем список для дальнейшего формирования JSON
         let obj = {};
@@ -181,8 +205,8 @@ window.addEventListener("DOMContentLoaded", function () {
             }
         });
             // Очищаем форму (все imput) от введенных значений
-            for (let i = 0; i < input.length; i++) {
-                input[i].value = '';
+            for (let i = 0; i < contactInput.length; i++) {
+                contactInput[i].value = '';
             }
     });
 
