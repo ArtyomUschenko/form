@@ -148,10 +148,22 @@ window.addEventListener("DOMContentLoaded", function () {
 
         let request = new XMLHttpRequest(); //Создаем объект через который будем выполнять HTTP-запросы
         request.open("POST", "server.php"); //Инициализируем запрос на сервер
-        request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Указываем заголовок HTTP-запроса. Наш контент будет получен из формы.
+        //request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); //Указываем заголовок HTTP-запроса. Наш контент будет получен из формы.
+        request.setRequestHeader('Content-type', 'application/json; charset=utf-8'); //Указываем заголовок HTTP-запроса. Указываем на JSON
 
         let formData = new FormData(form); //Получаем данные из формы
-        request.send(formData); // Отправляем данные из формы на сервер
+
+        //Перебираем массив через forEach и заполняем список для дальнейшего формирования JSON
+        let obj = {};
+        formData.forEach( function (value, key) {
+            obj[key] = value;
+        })
+        //Преобразуем в JSON формат
+        let json = JSON.stringify(obj);
+
+
+        // request.send(formData); // Отправляем данные из формы на сервер
+        request.send(json) // Отправляем данные в формате JSON
 
             //Наблюдаем за состоянием нашего запроса
         request.addEventListener("readystatechange", function () {
